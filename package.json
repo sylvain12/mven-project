@@ -4,16 +4,20 @@
   "description": "Client app backend API",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "server": "nodemon server.js --ignore 'client/'",
+    "client": "npm run serve --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\" "
   },
   "author": "Sylvain Kadjo",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mongoose": "^5.12.3"
   },
   "devDependencies": {
+    "concurrently": "^6.0.2",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.7"
   }

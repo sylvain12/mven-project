@@ -1,6 +1,7 @@
 // THIRD PARTY PACKAGE
 const express = require('express');
 const morgan = require('morgan');
+const cors = require('cors');
 
 // API ROUTE
 const clientRoute = require('./routes/clientRoutes');
@@ -11,7 +12,9 @@ const app = express();
 
 // GLOBAL MIDDLEWARE
 if (process.env.NODE_ENV === 'development') app.use(morgan('tiny'));
+app.use(cors());
 app.use(express.json());
+
 
 app.get('/', (req, res) => res.redirect('/api/v1/clients'));
 
