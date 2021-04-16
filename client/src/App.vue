@@ -5,7 +5,9 @@
       @cancelClientDialog="cancelDialog"
       :isClientDialogShowed="showClientDialog"
       :loadedProviders="providers"
+      :client="client"
     />
+    <ConfirmDialog></ConfirmDialog>
     <div class="header">
       <h1>Clients Manager</h1>
 
@@ -55,11 +57,14 @@
 <script>
 import AddClient from "./components/AddClient.vue";
 import axios from "axios";
+// import Toast from "primevue/toast";
+import ConfirmDialog from "primevue/confirmdialog";
 
 export default {
   name: "App",
   components: {
     AddClient,
+    ConfirmDialog,
   },
   data() {
     return {
@@ -68,6 +73,12 @@ export default {
       showClientDialog: false,
       providers: null,
       submitted: false,
+      client: {
+        name: "",
+        email: "",
+        phone: "",
+        providers: [],
+      },
     };
   },
   created() {},
@@ -95,31 +106,84 @@ export default {
     },
 
     confirmDeleteClient(client) {
-      console.log(`Do you want to delete ${client.name}`);
+      this.$confirm.require({
+        message: "Are you sure you want to proceed?",
+        header: "Confirmation",
+        icon: "pi pi-exclamation-triangle",
+        accept: () => {
+          this.handleDeleteClient(client);
+        },
+        reject: () => {
+          console.log("delete reject");
+        },
+      });
     },
 
     addNewClient(client) {
-      this.handleNewClient(client)
-        .then((data) => console.log(data))
+      const body = JSON.stringify(client);
+      const headers = {
+        "Content-type": "application/json",
+      };
+      axios
+        .post("api/v1/clients", body, {
+          headers: headers,
+        })
+        .then((res) => {
+          if (res.data.status === "success") {
+            this.showClientDialog = false;
+            this.clients.push(res.data.data.client);
+            this.resetClient();
+            this.showToast(
+              "success",
+              "New Client",
+              "Client successfuly created"
+            );
+          }
+        })
         .catch((err) => console.log(err));
     },
 
-    async handleNewClient(client) {
-      console.log(client);
-      const response = await axios.post(
-        "api/v1/clients",
-        JSON.stringify(client),
-        {
-          headers: { "Content-Type": "application.json" },
-        }
-      );
-      return await response.data;
+    handleDeleteClient(client) {
+      axios
+        .delete(`api/v1/clients/${client._id}`)
+        .then(() => {
+          this.clients = this.clients.filter((el) => el._id !== client._id);
+          this.showToast(
+            "success",
+            "Delete successfull",
+            "The client has been deleted!"
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+          this.showToast(
+            "error",
+            "Delete client error",
+            "An error ocure while deleting the client, try again!"
+          );
+        });
     },
 
     async loadProviders() {
       const response = await axios.get("api/v1/providers");
       const results = await response.data;
       return results.data;
+    },
+
+    showToast(responseStatus, title, message) {
+      this.$toast.add({
+        severity: responseStatus,
+        summary: title,
+        detail: message,
+        life: 3000,
+      });
+    },
+
+    resetClient() {
+      this.client.name = "";
+      this.client.email = "";
+      this.client.phone = "";
+      this.client.providers = [];
     },
   },
 };

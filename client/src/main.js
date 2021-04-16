@@ -4,6 +4,8 @@ import PrimeVue from 'primevue/config';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
+import ToastService from 'primevue/toastservice';
+import ConfirmationService from 'primevue/confirmationservice';
 
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primevue/resources/primevue.min.css';
@@ -12,7 +14,10 @@ import './styles.css';
 
 Vue.config.productionTip = false;
 
+
 Vue.use(PrimeVue, { ripple: true });
+Vue.use(ToastService);
+Vue.use(ConfirmationService);
 Vue.component('DataTable', DataTable);
 Vue.component('Column', Column);
 Vue.component('Button', Button);

@@ -101,6 +101,7 @@ export default {
       default: false,
     },
     loadedProviders: Array,
+    client: Object,
   },
   data() {
     return {
@@ -108,12 +109,6 @@ export default {
       isEditing: false,
       // selectedProviders: null,
       providers: [],
-      client: {
-        name: "",
-        email: "",
-        phone: "",
-        providers: [],
-      },
     };
   },
 
