@@ -11,8 +11,8 @@ const providerRoute = require('./routes/providerRoutes');
 const app = express();
 
 // GLOBAL MIDDLEWARE
-if (process.env.NODE_ENV === 'development') app.use(morgan('tiny'));
 app.use(cors());
+if (process.env.NODE_ENV === 'development') app.use(morgan('tiny'));
 app.use(express.json());
 
 

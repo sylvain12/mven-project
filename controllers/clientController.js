@@ -4,7 +4,7 @@ const { Provider } = require('../models/providerModel');
 
 exports.getAllClients = async (req, res) => {
   try {
-    const clients = await Client.find().select('-__v');
+    const clients = await Client.find().populate('providers').select('-__v');
     res
       .status(200)
       .json({

@@ -1,0 +1,17 @@
+/* GLOBAL STYLE */
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.container {
+  width: 50%;
+  max-width: 875px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
