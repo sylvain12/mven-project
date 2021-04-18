@@ -54,7 +54,7 @@
         </div>
       </div>
 
-      <div class="p-col">
+      <!-- <div class="p-col">
         <div class="p-field">
           <label for="providers">Providers</label>
           <MultiSelect
@@ -66,9 +66,20 @@
 
           <small id="providers-help"></small>
         </div>
-      </div>
+      </div> -->
     </div>
     <!-- </form> -->
+
+    <!-- Provider List -->
+    <!-- <Card> -->
+    <ProviderList
+      @deleteProdiver="deleteProvider($event)"
+      @addProvider="addProvider($event)"
+      :providers="providers"
+      :provider="provider"
+      style="margin-top: 1rem"
+    />
+    <!-- </Card> -->
 
     <template #footer>
       <Button
@@ -86,7 +97,8 @@
 import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
 import MultiSelect from "primevue/multiselect";
-// import axios from "axios";
+import ProviderList from "./ProviderList.vue";
+import Card from "primevue/card";
 
 export default {
   name: "AddClient",
@@ -94,6 +106,8 @@ export default {
     Dialog,
     InputText,
     MultiSelect,
+    ProviderList,
+    Card,
   },
   props: {
     isClientDialogShowed: {
@@ -102,24 +116,28 @@ export default {
     },
     loadedProviders: Array,
     client: Object,
+    providerName: String,
   },
   data() {
     return {
       clientDialog: this.isClientDialogShowed,
       isEditing: false,
-      // selectedProviders: null,
       providers: [],
+      provider: this.providerName,
     };
   },
+  mounted() {},
 
   destroyed() {
     this.clientDialog = false;
   },
 
   watch: {
-    loadedProviders: function (newVal, oldVal) {
-      console.log("Prop changed: ", newVal, " | was: ", oldVal);
+    loadedProviders: function (newVal) {
       this.providers = newVal;
+    },
+    providerName: function (newVal) {
+      this.provider = newVal;
     },
   },
 
@@ -129,9 +147,18 @@ export default {
     },
 
     save() {
-      // this.client.providers = this.selectedProviders;
       this.$emit("newClient", this.client);
     },
+
+    //  Provider emit handler ==========
+    deleteProvider(providerID) {
+      this.$emit("deleteProvider", providerID);
+    },
+
+    addProvider(providerName) {
+      this.$emit("addProvider", providerName);
+    },
+    // END =====================
 
     checkForm() {
       // this.save();

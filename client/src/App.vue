@@ -6,6 +6,9 @@
       :isClientDialogShowed="showClientDialog"
       :loadedProviders="providers"
       :client="client"
+      @deleteProvider="deleteProvider($event)"
+      @addProvider="addProvider($event)"
+      :providerName="provider"
     />
     <ConfirmDialog></ConfirmDialog>
     <div class="header">
@@ -29,8 +32,14 @@
       <Column field="phone" header="Phone" sortable></Column>
       <Column field="providers" header="Providers">
         <template #body="slotProps">
-          <div v-for="provider in slotProps.data.providers" :key="provider.id">
-            {{ provider.name }},
+          <div v-if="slotProps.data.providers">
+            <div
+              class="p-d-flex p-jc-between"
+              v-for="provider in slotProps.data.providers"
+              :key="provider.id"
+            >
+              <span>{{ provider.name }}</span>
+            </div>
           </div>
         </template>
       </Column>
@@ -57,7 +66,6 @@
 <script>
 import AddClient from "./components/AddClient.vue";
 import axios from "axios";
-// import Toast from "primevue/toast";
 import ConfirmDialog from "primevue/confirmdialog";
 
 export default {
@@ -69,10 +77,11 @@ export default {
   data() {
     return {
       columns: null,
+      submitted: false,
       clients: null,
       showClientDialog: false,
       providers: null,
-      submitted: false,
+      provider: "",
       client: {
         name: "",
         email: "",
@@ -113,14 +122,15 @@ export default {
         accept: () => {
           this.handleDeleteClient(client);
         },
-        reject: () => {
-          console.log("delete reject");
-        },
+        reject: () => {},
       });
     },
 
     addNewClient(client) {
-      const body = JSON.stringify(client);
+      const providersID = client.providers.map((provider) => provider._id);
+      const clientData = { ...client };
+      clientData.providers = providersID;
+      const body = JSON.stringify(clientData);
       const headers = {
         "Content-type": "application/json",
       };
@@ -133,11 +143,6 @@ export default {
             this.showClientDialog = false;
             this.clients.push(res.data.data.client);
             this.resetClient();
-            this.showToast(
-              "success",
-              "New Client",
-              "Client successfuly created"
-            );
           }
         })
         .catch((err) => console.log(err));
@@ -164,11 +169,47 @@ export default {
         });
     },
 
+    //============= Providers CRUD ===========
+    // Load provider list
     async loadProviders() {
       const response = await axios.get("api/v1/providers");
       const results = await response.data;
       return results.data;
     },
+
+    // Delete provider
+    deleteProvider(providerID) {
+      axios
+        .delete(`api/v1/providers/${providerID}`)
+        .then((res) => {
+          console.log(res.data);
+          this.providers = this.providers.filter((el) => el._id !== providerID);
+        })
+        .catch((err) => console.log(err));
+    },
+
+    // Add provider
+    addProvider(provider) {
+      const body = JSON.stringify({ name: provider });
+      axios
+        .post(`api/v1/providers`, body, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((res) => {
+          const item = res.data.data.provider;
+          this.provider = "";
+          console.log(res.data);
+          if (res.data.status === "success") {
+            console.log(this.provider);
+            this.providers.push(item);
+          }
+        })
+        .catch((err) => console.log(err));
+    },
+
+    //=============== END ==============
 
     showToast(responseStatus, title, message) {
       this.$toast.add({

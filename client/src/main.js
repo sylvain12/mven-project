@@ -14,6 +14,8 @@ import './styles.css';
 
 Vue.config.productionTip = false;
 
+export const Bus = new Vue();
+
 
 Vue.use(PrimeVue, { ripple: true });
 Vue.use(ToastService);

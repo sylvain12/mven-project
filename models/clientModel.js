@@ -18,12 +18,12 @@ const clientSchema = new mongoose.Schema({
     type: String,
     unique: true,
   },
-  // providers: [
-  //   {
-  //     type: mongoose.Schema.ObjectId,
-  //     ref: 'Provider',
-  //   }
-  // ]
+  providers: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Provider',
+    }
+  ]
 });
 
 const Client = mongoose.model('Client', clientSchema);
