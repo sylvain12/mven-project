@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h3 class="provider-title">Provider List</h3>
     <div class="provider-add-form">
       <InputText
         type="text"
@@ -28,6 +29,7 @@
               name="providers"
               :value="slotProps.data._id"
               class="provider-checkbox"
+              @change="loadSelectedProviders"
             />
             <label :for="slotProps.data._id">{{ slotProps.data.name }}</label>
           </div>
@@ -53,6 +55,7 @@ import DataView from "primevue/dataview";
 import Button from "primevue/button";
 import Checkbox from "primevue/checkbox";
 import InputText from "primevue/inputtext";
+import { eventBus } from "../main";
 
 export default {
   name: "ProviderList",
@@ -91,6 +94,10 @@ export default {
     addProvider() {
       this.$emit("addProvider", this.providerName);
     },
+
+    loadSelectedProviders() {
+      eventBus.$emit("loadSelectedProviders", this.selectedProviders);
+    },
   },
 };
 </script>
@@ -110,6 +117,11 @@ export default {
   display: flex;
   align-items: stretch;
   justify-content: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+}
+
+.provider-title {
+  margin-bottom: 1rem;
+  margin-top: 2rem;
 }
 </style>

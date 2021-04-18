@@ -14,7 +14,7 @@ import './styles.css';
 
 Vue.config.productionTip = false;
 
-export const Bus = new Vue();
+export const eventBus = new Vue();
 
 
 Vue.use(PrimeVue, { ripple: true });

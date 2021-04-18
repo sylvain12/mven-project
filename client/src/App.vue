@@ -67,6 +67,7 @@
 import AddClient from "./components/AddClient.vue";
 import axios from "axios";
 import ConfirmDialog from "primevue/confirmdialog";
+import { eventBus } from "./main";
 
 export default {
   name: "App",
@@ -80,6 +81,7 @@ export default {
       submitted: false,
       clients: null,
       showClientDialog: false,
+      selectedProviders: [],
       providers: null,
       provider: "",
       client: {
@@ -96,6 +98,10 @@ export default {
     const response = await axios.get("api/v1/clients");
     const results = response.data.data.clients;
     this.clients = results;
+
+    eventBus.$on("loadSelectedProviders", (data) => {
+      this.selectedProviders = data;
+    });
   },
 
   methods: {
@@ -127,9 +133,9 @@ export default {
     },
 
     addNewClient(client) {
-      const providersID = client.providers.map((provider) => provider._id);
       const clientData = { ...client };
-      clientData.providers = providersID;
+      clientData.providers = this.selectedProviders;
+
       const body = JSON.stringify(clientData);
       const headers = {
         "Content-type": "application/json",
@@ -139,6 +145,7 @@ export default {
           headers: headers,
         })
         .then((res) => {
+          console.log(res.data);
           if (res.data.status === "success") {
             this.showClientDialog = false;
             this.clients.push(res.data.data.client);

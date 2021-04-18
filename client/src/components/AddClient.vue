@@ -117,6 +117,7 @@ export default {
     loadedProviders: Array,
     client: Object,
     providerName: String,
+    selectProv: Array,
   },
   data() {
     return {
@@ -124,6 +125,7 @@ export default {
       isEditing: false,
       providers: [],
       provider: this.providerName,
+      vals: [],
     };
   },
   mounted() {},
