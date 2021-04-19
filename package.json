@@ -6,7 +6,8 @@
   "scripts": {
     "server": "nodemon server.js --ignore 'client/'",
     "client": "npm run serve --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\" "
+    "dev": "concurrently \"npm run server\" \"npm run client\" ",
+    "debug": "ndb server"
   },
   "author": "Sylvain Kadjo",
   "license": "ISC",
@@ -14,7 +15,8 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "mongoose": "^5.12.3"
+    "mongoose": "^5.12.3",
+    "validator": "^13.5.2"
   },
   "devDependencies": {
     "concurrently": "^6.0.2",

@@ -22,9 +22,15 @@
             id="name"
             v-model="client.name"
             class="p-inputtext-lg"
+            v-bind:class="{ 'p-invalid': errors && errors.name }"
             aria-describedby="name-help"
           />
-          <small id="name-help"></small>
+          <small
+            v-if="errors && errors.name"
+            id="name-help"
+            class="p-invalid"
+            >{{ errors.name.message }}</small
+          >
         </div>
       </div>
 
@@ -36,8 +42,14 @@
             v-model="client.email"
             class="p-inputtext-lg"
             aria-describedby="email-help"
+            v-bind:class="{ 'p-invalid': errors && errors.email }"
           />
-          <small id="amail-help"></small>
+          <small
+            v-if="errors && errors.email"
+            id="amail-help"
+            class="p-invalid"
+            >{{ errors.email.message }}</small
+          >
         </div>
       </div>
 
@@ -76,10 +88,11 @@
       @deleteProdiver="deleteProvider($event)"
       @addProvider="addProvider($event)"
       :providers="providers"
-      :provider="provider"
+      :provider="providerName"
       style="margin-top: 1rem"
       :clientProviders="clientProviders"
       :isEditing="editMode"
+      :providersErrors="providersErrors"
     />
     <!-- </Card> -->
 
@@ -135,6 +148,8 @@ export default {
     providerName: String,
     selectProv: Array,
     isEditing: Boolean,
+    errors: Object,
+    providersErrors: Object,
   },
   data() {
     return {

@@ -11,6 +11,8 @@
       :providerName="provider"
       :isEditing="isEditing"
       :selectProv="selectedProviders"
+      :errors="errors"
+      :providersErrors="providersErrors"
     />
     <ConfirmDialog></ConfirmDialog>
     <div class="header">
@@ -104,9 +106,11 @@ export default {
       selectedProviders: [],
       providers: null,
       provider: "",
-      numberPerPage: 10,
+      numberPerPage: 8,
       searchClientText: "",
       filteredClients: null,
+      errors: {},
+      providersErrors: {},
       client: {
         name: "",
         email: "",
@@ -149,13 +153,11 @@ export default {
           );
           return item;
         });
-
-        // this.filteredClients = [...this.clients];
       }
     },
 
     clients: function (newVal) {
-      this.clients = newVal;
+      this.updateFilteredClients(newVal);
     },
   },
 
@@ -212,6 +214,7 @@ export default {
 
     // Create new client
     addNewClient(client) {
+      this.errors = {};
       const clientData = { ...client };
       clientData.providers = this.selectedProviders;
 
@@ -226,11 +229,27 @@ export default {
         .then((res) => {
           if (res.data.status === "success") {
             this.showClientDialog = false;
-            console.log(res.data.data.client);
+            this.clients.push(res.data.data.client);
             this.resetClient();
           }
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          const errResponse = err.response;
+          const responseData = errResponse.data.error;
+
+          if (responseData.code === 11000 && responseData.keyValue.email) {
+            const errObj = {};
+            errObj.email = {
+              path: "email",
+              message: `Duplicate field value: "${responseData.keyValue.email}" Please use another value`,
+            };
+            this.errors = errObj;
+          } else {
+            this.errors = responseData.errors;
+          }
+
+          console.log(this.errors);
+        });
     },
 
     // Delete Client
@@ -247,11 +266,6 @@ export default {
         })
         .catch((err) => {
           console.log(err);
-          this.showToast(
-            "error",
-            "Delete client error",
-            "An error ocure while deleting the client, try again!"
-          );
         });
     },
 
@@ -271,8 +285,8 @@ export default {
             return item;
           });
 
-          this.filteredClients = [...this.clients];
-          this.handleSearchClient(this.searchClientText);
+          // this.filteredClients = [...this.clients];
+          // this.handleSearchClient(this.searchClientText);
 
           this.showClientDialog = false;
         })
@@ -300,6 +314,13 @@ export default {
 
     filterAndSortBeans(clientsList) {
       return clientsList.filter(this.evaluateMatchWithClient);
+    },
+
+    // Load filtered clients while clients data updates
+    updateFilteredClients(newClientList) {
+      this.clients = newClientList;
+      this.filteredClients = newClientList;
+      this.handleSearchClient(this.searchClientText);
     },
 
     // Get client selected Providers on edit mode
@@ -337,13 +358,27 @@ export default {
         })
         .then((res) => {
           const item = res.data.data.provider;
-          this.provider = "";
-          console.log(res.data);
           if (res.data.status === "success") {
             this.providers.push(item);
+            this.resetProvider();
+            console.log(this.provider);
           }
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          const errResponse = err.response;
+          const responseData = errResponse.data.error;
+
+          if (responseData.code === 11000 && responseData.keyValue.name) {
+            const errObj = {};
+            errObj.name = {
+              path: "name",
+              message: `Duplicate field value: "${responseData.keyValue.name}" Please use another value`,
+            };
+            this.providersErrors = errObj;
+          } else {
+            this.providersErrors = responseData.errors;
+          }
+        });
     },
 
     //=============== END ==============
@@ -366,6 +401,13 @@ export default {
       this.client.email = "";
       this.client.phone = "";
       this.client.providers = [];
+      this.errors = {};
+    },
+
+    // Reset client forms after creations
+    resetProvider() {
+      this.provider = "";
+      this.providersErrors = {};
     },
   },
 };

@@ -1,12 +1,20 @@
 <template>
   <div>
     <h3 class="provider-title">Provider List</h3>
+
+    <small
+      v-if="providersErrors && providersErrors.name"
+      id="provider-name-help"
+      class="p-invalid"
+      >{{ providersErrors.name.message }}</small
+    >
     <div class="provider-add-form">
       <InputText
         type="text"
         v-model="providerName"
         placeholder="Add new provider"
         @keypress.enter="addProvider"
+        v-bind:class="{ 'p-invalid': providersErrors && providersErrors.name }"
       />
       <Button
         icon="pi pi-plus"
@@ -73,6 +81,7 @@ export default {
     provider: String,
     clientProviders: Array,
     isEditing: Boolean,
+    providersErrors: Object,
   },
 
   data() {
