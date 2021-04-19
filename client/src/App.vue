@@ -24,10 +24,16 @@
       />
     </div>
 
+    <div class="search">
+      <SearchClient />
+    </div>
+
     <DataTable
       ref="dt"
-      :value="clients"
+      :value="filteredClients"
       class="p-datatable-striped p-datatable-responsive-demo"
+      :paginator="true"
+      :rows="numberPerPage"
     >
       <Column field="name" header="Name" sortable></Column>
       <Column field="email" header="Email" sortable></Column>
@@ -79,12 +85,14 @@ import AddClient from "./components/AddClient.vue";
 import axios from "axios";
 import ConfirmDialog from "primevue/confirmdialog";
 import { eventBus } from "./main";
+import SearchClient from "./components/SearchClient.vue";
 
 export default {
   name: "App",
   components: {
     AddClient,
     ConfirmDialog,
+    SearchClient,
   },
   data() {
     return {
@@ -96,6 +104,9 @@ export default {
       selectedProviders: [],
       providers: null,
       provider: "",
+      numberPerPage: 10,
+      searchClientText: "",
+      filteredClients: null,
       client: {
         name: "",
         email: "",
@@ -110,9 +121,15 @@ export default {
     const response = await axios.get("api/v1/clients");
     const results = response.data.data.clients;
     this.clients = results;
+    this.filteredClients = this.clients;
 
     eventBus.$on("loadSelectedProviders", (data) => {
       this.selectedProviders = data;
+    });
+
+    eventBus.$on("searchClient", (data) => {
+      this.searchClientText = data;
+      this.handleSearchClient(data);
     });
   },
 
@@ -237,6 +254,7 @@ export default {
         });
     },
 
+    // Edit client
     handleEditClient(client) {
       const body = JSON.stringify(client);
       axios
@@ -255,6 +273,29 @@ export default {
           this.showClientDialog = false;
         })
         .catch((err) => console.log(err));
+    },
+
+    // Search In Client table
+    handleSearchClient(search) {
+      if (search === "") this.filteredClients = this.clients;
+      this.filteredClients = this.filterAndSortBeans(this.clients, search);
+    },
+
+    evaluateMatchWithClient(value) {
+      const space = " ";
+      let clientInfo = " ";
+
+      if (value.name) clientInfo = value.name;
+      if (value.email) clientInfo = clientInfo + space + value.email;
+      if (value.phone) clientInfo = clientInfo + space + value.phone;
+
+      return clientInfo
+        .toLowerCase()
+        .includes(this.searchClientText.toLowerCase());
+    },
+
+    filterAndSortBeans(clientsList) {
+      return clientsList.filter(this.evaluateMatchWithClient);
     },
 
     // Get client selected Providers on edit mode
@@ -336,5 +377,9 @@ export default {
 
 .client-providers-list > *:not(:last-child) {
   margin-right: 4px;
+}
+
+.search {
+  margin-bottom: 1rem;
 }
 </style>
