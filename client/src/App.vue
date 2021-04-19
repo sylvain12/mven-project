@@ -135,7 +135,7 @@ export default {
 
   watch: {
     providers: function (newVal, oldVal) {
-      // Update clients providers handle provider delted
+      // Update clients providers handle provider deleted
       const newValID = newVal.map((el) => el._id);
       if (oldVal && newVal.length !== oldVal.length) {
         const oldValID = oldVal.map((el) => el._id);
@@ -143,12 +143,14 @@ export default {
         const rightDiff = oldValID.filter((el) => !newValID.includes(el));
         const diff = [...leftDiff, ...rightDiff];
 
-        this.clients = this.clients.map((item) => {
+        this.filteredClients = this.filteredClients.map((item) => {
           item.providers = item.providers.filter(
             (el) => !diff.includes(el._id)
           );
           return item;
         });
+
+        // this.filteredClients = [...this.clients];
       }
     },
 
@@ -203,7 +205,6 @@ export default {
         .catch((err) => console.log(err));
 
       this.selectedProviders = this.client.providers;
-      // eventBus.$emit("loadClientProviders", this.selectedProviders);
       eventBus.$on("editClient", (data) => {
         this.handleEditClient(data);
       });
@@ -225,7 +226,7 @@ export default {
         .then((res) => {
           if (res.data.status === "success") {
             this.showClientDialog = false;
-            this.clients.push(res.data.data.client);
+            console.log(res.data.data.client);
             this.resetClient();
           }
         })
@@ -269,6 +270,9 @@ export default {
             if (updatedClient._id === item._id) return updatedClient;
             return item;
           });
+
+          this.filteredClients = [...this.clients];
+          this.handleSearchClient(this.searchClientText);
 
           this.showClientDialog = false;
         })
