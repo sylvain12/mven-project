@@ -22,7 +22,7 @@ exports.getAllClients = async (req, res) => {
 
 exports.createClient = async (req, res) => {
   try {
-    const client = await Client.create(req.body);
+    const client = await (await Client.create(req.body)).populate('providers').execPopulate();
     res.status(201).json({ status: 'success', data: { client } });
   } catch (error) {
     res.status(400).json({ status: 'fail', message: error });

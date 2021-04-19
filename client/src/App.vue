@@ -32,13 +32,22 @@
       <Column field="phone" header="Phone" sortable></Column>
       <Column field="providers" header="Providers">
         <template #body="slotProps">
-          <div v-if="slotProps.data.providers">
+          <div v-if="slotProps.data.providers" class="client-providers-list">
             <div
-              class="p-d-flex p-jc-between"
               v-for="provider in slotProps.data.providers"
               :key="provider.id"
             >
-              <span>{{ provider.name }}</span>
+              <span
+                >{{ provider.name
+                }}<span
+                  v-if="
+                    slotProps.data.providers[
+                      slotProps.data.providers.length - 1
+                    ]._id !== provider._id
+                  "
+                  >,
+                </span></span
+              >
             </div>
           </div>
         </template>
@@ -104,7 +113,17 @@ export default {
     });
   },
 
+  // watch: {
+  //   clients: function (newVal) {
+  //     console.log(newVal);
+  //     this.clients = newVal;
+  //   },
+  // },
+
   methods: {
+    // Generales actions
+
+    // Open client + providers creation dialog
     openNew() {
       this.showClientDialog = true;
       this.loadProviders()
@@ -112,14 +131,12 @@ export default {
         .catch((err) => console.log(err));
     },
 
+    // Close Create client Dialog
     cancelDialog() {
       this.showClientDialog = false;
     },
 
-    editClient(client) {
-      console.log(`${client.name} edited`);
-    },
-
+    // Show comfirm dialog for client delete
     confirmDeleteClient(client) {
       this.$confirm.require({
         message: "Are you sure you want to proceed?",
@@ -131,7 +148,16 @@ export default {
         reject: () => {},
       });
     },
+    //===============  END ==================================
 
+    //===============  Client Actions =========================
+
+    // Edit Client
+    editClient(client) {
+      console.log(`${client.name} edited`);
+    },
+
+    // Create new client
     addNewClient(client) {
       const clientData = { ...client };
       clientData.providers = this.selectedProviders;
@@ -155,6 +181,7 @@ export default {
         .catch((err) => console.log(err));
     },
 
+    // Delete Client
     handleDeleteClient(client) {
       axios
         .delete(`api/v1/clients/${client._id}`)
@@ -175,6 +202,8 @@ export default {
           );
         });
     },
+
+    // ======================= END ====================
 
     //============= Providers CRUD ===========
     // Load provider list
@@ -218,6 +247,9 @@ export default {
 
     //=============== END ==============
 
+    // More actions
+
+    // Toast
     showToast(responseStatus, title, message) {
       this.$toast.add({
         severity: responseStatus,
@@ -227,6 +259,7 @@ export default {
       });
     },
 
+    // Reset client forms after creations
     resetClient() {
       this.client.name = "";
       this.client.email = "";
@@ -237,5 +270,14 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.client-providers-list {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.client-providers-list > *:not(:last-child) {
+  margin-right: 4px;
+}
 </style>
