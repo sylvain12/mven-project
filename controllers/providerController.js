@@ -3,6 +3,8 @@
 
 // Provider model
 const { Provider } = require('../models/providerModel');
+const Client = require('../models/clientModel');
+const { getAllClients } = require('../controllers/clientController');
 
 
 // HANDLERS ==============================
@@ -53,19 +55,10 @@ exports.updateProvider = async (req, res) => {
 };
 
 exports.deleteProvider = async (req, res) => {
-  Provider.findById(req.params.id)
-    .populate('clients')
-    .exec(function (err, project) {
-      if (err) console.log(err);
-      console.log(project);
-    });
-
-  // try {
-  //   await Provider.findByIdAndDelete(req.params.id);
-  //   return res.status(202).json({ status: 'success', data: null });
-  // } catch (error) {
-  //   return res.status(404).json({ status: 'fail', message: error });
-  // }
-
-  res.end('Finish');
+  try {
+    await Provider.findByIdAndDelete(req.params.id);
+    return res.status(202).json({ status: 'success', data: null });
+  } catch (error) {
+    return res.status(404).json({ status: 'fail', message: error });
+  }
 };

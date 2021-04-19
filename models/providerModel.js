@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Client = require('../models/clientModel');
 
 
 const providerSchema = new mongoose.Schema({
@@ -7,6 +8,15 @@ const providerSchema = new mongoose.Schema({
     required: [true, 'A provider must have a name'],
     unique: true,
   }
+});
+
+providerSchema.pre('remove', function (next) {
+  this.model('Client').updateMany(
+    {},
+    { "$pull": { "providers": this._id } },
+    { "multi": true },
+    next,
+  );
 });
 
 const Provider = mongoose.model('Provider', providerSchema);

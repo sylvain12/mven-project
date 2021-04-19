@@ -5,8 +5,8 @@ body {
 }
 
 .container {
-  width: 50%;
-  max-width: 875px;
+  /* width: 50%; */
+  max-width: 1114px;
   margin: 0 auto;
 }
 
