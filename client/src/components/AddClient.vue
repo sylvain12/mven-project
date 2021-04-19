@@ -9,8 +9,8 @@
     :closable="false"
   >
     <template #header>
-      <h2 v-if="isEditing">Edit the client</h2>
-      <h2 v-if="!isEditing">Add new client</h2>
+      <h2 v-if="editMode">Edit the client</h2>
+      <h2 v-if="!editMode">Add new client</h2>
     </template>
 
     <!-- <form @submit.prevent="checkForm" method="post"> -->
@@ -78,6 +78,8 @@
       :providers="providers"
       :provider="provider"
       style="margin-top: 1rem"
+      :clientProviders="clientProviders"
+      :isEditing="editMode"
     />
     <!-- </Card> -->
 
@@ -88,7 +90,20 @@
         class="p-button-text"
         @click="cancel"
       />
-      <Button type="submit" @click="save" label="Save" icon="pi pi-check" />
+      <Button
+        v-if="!editMode"
+        type="submit"
+        @click="save"
+        label="Save"
+        icon="pi pi-check"
+      />
+      <Button
+        v-if="editMode"
+        type="submit"
+        @click="edit"
+        label="Save"
+        icon="pi pi-check"
+      />
     </template>
   </Dialog>
 </template>
@@ -99,6 +114,7 @@ import InputText from "primevue/inputtext";
 import MultiSelect from "primevue/multiselect";
 import ProviderList from "./ProviderList.vue";
 import Card from "primevue/card";
+import { eventBus } from "../main";
 
 export default {
   name: "AddClient",
@@ -118,14 +134,16 @@ export default {
     client: Object,
     providerName: String,
     selectProv: Array,
+    isEditing: Boolean,
   },
   data() {
     return {
       clientDialog: this.isClientDialogShowed,
-      isEditing: false,
       providers: [],
+      clientProviders: [],
       provider: this.providerName,
       vals: [],
+      editMode: false,
     };
   },
   mounted() {},
@@ -141,6 +159,16 @@ export default {
     providerName: function (newVal) {
       this.provider = newVal;
     },
+
+    isEditing: function (newVal) {
+      this.editMode = newVal;
+    },
+
+    selectProv: function (newVal) {
+      if (this.editMode) {
+        this.clientProviders = newVal;
+      }
+    },
   },
 
   methods: {
@@ -150,6 +178,11 @@ export default {
 
     save() {
       this.$emit("newClient", this.client);
+    },
+
+    edit() {
+      this.client.providers = this.selectProv;
+      eventBus.$emit("editClient", this.client);
     },
 
     //  Provider emit handler ==========

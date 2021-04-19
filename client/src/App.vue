@@ -9,6 +9,8 @@
       @deleteProvider="deleteProvider($event)"
       @addProvider="addProvider($event)"
       :providerName="provider"
+      :isEditing="isEditing"
+      :selectProv="selectedProviders"
     />
     <ConfirmDialog></ConfirmDialog>
     <div class="header">
@@ -90,6 +92,7 @@ export default {
       submitted: false,
       clients: null,
       showClientDialog: false,
+      isEditing: false,
       selectedProviders: [],
       providers: null,
       provider: "",
@@ -113,12 +116,29 @@ export default {
     });
   },
 
-  // watch: {
-  //   clients: function (newVal) {
-  //     console.log(newVal);
-  //     this.clients = newVal;
-  //   },
-  // },
+  watch: {
+    providers: function (newVal, oldVal) {
+      // Update clients providers handle provider delted
+      const newValID = newVal.map((el) => el._id);
+      if (oldVal && newVal.length !== oldVal.length) {
+        const oldValID = oldVal.map((el) => el._id);
+        const leftDiff = newValID.filter((el) => !oldValID.includes(el));
+        const rightDiff = oldValID.filter((el) => !newValID.includes(el));
+        const diff = [...leftDiff, ...rightDiff];
+
+        this.clients = this.clients.map((item) => {
+          item.providers = item.providers.filter(
+            (el) => !diff.includes(el._id)
+          );
+          return item;
+        });
+      }
+    },
+
+    clients: function (newVal) {
+      this.clients = newVal;
+    },
+  },
 
   methods: {
     // Generales actions
@@ -126,6 +146,7 @@ export default {
     // Open client + providers creation dialog
     openNew() {
       this.showClientDialog = true;
+      this.isEditing = false;
       this.loadProviders()
         .then((data) => (this.providers = data.providers))
         .catch((err) => console.log(err));
@@ -134,6 +155,9 @@ export default {
     // Close Create client Dialog
     cancelDialog() {
       this.showClientDialog = false;
+      this.isEditing = false;
+      this.selectedProviders = [];
+      this.client = {};
     },
 
     // Show comfirm dialog for client delete
@@ -154,7 +178,18 @@ export default {
 
     // Edit Client
     editClient(client) {
-      console.log(`${client.name} edited`);
+      this.showClientDialog = true;
+      this.isEditing = true;
+      this.client = client;
+      this.loadProviders()
+        .then((data) => (this.providers = data.providers))
+        .catch((err) => console.log(err));
+
+      this.selectedProviders = this.client.providers;
+      // eventBus.$emit("loadClientProviders", this.selectedProviders);
+      eventBus.$on("editClient", (data) => {
+        this.handleEditClient(data);
+      });
     },
 
     // Create new client
@@ -171,7 +206,6 @@ export default {
           headers: headers,
         })
         .then((res) => {
-          console.log(res.data);
           if (res.data.status === "success") {
             this.showClientDialog = false;
             this.clients.push(res.data.data.client);
@@ -202,6 +236,29 @@ export default {
           );
         });
     },
+
+    handleEditClient(client) {
+      const body = JSON.stringify(client);
+      axios
+        .patch(`api/v1/clients/${client._id}`, body, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((res) => {
+          const updatedClient = res.data.data.client;
+          this.clients = this.clients.map((item) => {
+            if (updatedClient._id === item._id) return updatedClient;
+            return item;
+          });
+
+          this.showClientDialog = false;
+        })
+        .catch((err) => console.log(err));
+    },
+
+    // Get client selected Providers on edit mode
+    loadClientProviders() {},
 
     // ======================= END ====================
 

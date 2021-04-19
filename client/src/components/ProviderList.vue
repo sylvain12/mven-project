@@ -68,7 +68,10 @@ export default {
   props: {
     providers: Array,
     provider: String,
+    clientProviders: Array,
+    isEditing: Boolean,
   },
+
   data() {
     return {
       layout: "list",
@@ -77,6 +80,12 @@ export default {
       providerName: this.provider,
     };
   },
+
+  mounted() {
+    if (this.isEditing)
+      this.selectedProviders = this.clientProviders.map((item) => item._id);
+  },
+
   watch: {
     providers: function (newVal) {
       this.providersList = newVal;

@@ -45,7 +45,11 @@ exports.getClient = async (req, res) => {
 
 exports.updateClient = async (req, res) => {
   try {
-    const client = await Client.findByIdAndUpdate(req.params.id, req.body, { runValidators: true, new: true });
+    const client = await (await Client
+      .findByIdAndUpdate(req.params.id, req.body, { runValidators: true, new: true }))
+      .populate('providers')
+      .execPopulate();
+
     return res.status(200).json({ status: 'success', data: { client } });
   } catch (error) {
     return res.status(400).json({ status: 'fail', message: error });
