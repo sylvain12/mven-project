@@ -87,12 +87,15 @@
     <ProviderList
       @deleteProdiver="deleteProvider($event)"
       @addProvider="addProvider($event)"
+      @setProviderOnEdit="setProviderOnEdit($event)"
       :providers="providers"
       :provider="providerName"
       style="margin-top: 1rem"
       :clientProviders="clientProviders"
       :isEditing="editMode"
       :providersErrors="providersErrors"
+      :isProviderEditing="isProviderEditing"
+      :editingProvider="editingProvider"
     />
     <!-- </Card> -->
 
@@ -150,6 +153,8 @@ export default {
     isEditing: Boolean,
     errors: Object,
     providersErrors: Object,
+    isProviderEditing: Boolean,
+    editingProvider: Object,
   },
   data() {
     return {
@@ -203,6 +208,10 @@ export default {
     //  Provider emit handler ==========
     deleteProvider(providerID) {
       this.$emit("deleteProvider", providerID);
+    },
+
+    setProviderOnEdit(provider) {
+      this.$emit("setProviderOnEdit", provider);
     },
 
     addProvider(providerName) {

@@ -8,11 +8,14 @@
       :client="client"
       @deleteProvider="deleteProvider($event)"
       @addProvider="addProvider($event)"
+      @setProviderOnEdit="setEditModeProvider($event)"
       :providerName="provider"
       :isEditing="isEditing"
       :selectProv="selectedProviders"
       :errors="errors"
       :providersErrors="providersErrors"
+      :isProviderEditing="isProviderEditing"
+      :editingProvider="editingProvider"
     />
     <ConfirmDialog></ConfirmDialog>
     <div class="header">
@@ -109,6 +112,8 @@ export default {
       numberPerPage: 8,
       searchClientText: "",
       filteredClients: null,
+      isProviderEditing: false,
+      editingProvider: null,
       errors: {},
       providersErrors: {},
       client: {
@@ -134,6 +139,10 @@ export default {
     eventBus.$on("searchClient", (data) => {
       this.searchClientText = data;
       this.handleSearchClient(data);
+    });
+
+    eventBus.$on("editProvider", (data) => {
+      this.handleEditProvider(data);
     });
   },
 
@@ -247,8 +256,6 @@ export default {
           } else {
             this.errors = responseData.errors;
           }
-
-          console.log(this.errors);
         });
     },
 
@@ -290,7 +297,21 @@ export default {
 
           this.showClientDialog = false;
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          const errResponse = err.response;
+          const responseData = errResponse.data.error;
+
+          if (responseData.code === 11000 && responseData.keyValue.email) {
+            const errObj = {};
+            errObj.email = {
+              path: "email",
+              message: `Duplicate field value: "${responseData.keyValue.email}" Please use another value`,
+            };
+            this.errors = errObj;
+          } else {
+            this.errors = responseData.errors;
+          }
+        });
     },
 
     // Search In Client table
@@ -340,8 +361,7 @@ export default {
     deleteProvider(providerID) {
       axios
         .delete(`api/v1/providers/${providerID}`)
-        .then((res) => {
-          console.log(res.data);
+        .then(() => {
           this.providers = this.providers.filter((el) => el._id !== providerID);
         })
         .catch((err) => console.log(err));
@@ -363,6 +383,47 @@ export default {
             this.resetProvider();
             console.log(this.provider);
           }
+        })
+        .catch((err) => {
+          const errResponse = err.response;
+          const responseData = errResponse.data.error;
+
+          if (responseData.code === 11000 && responseData.keyValue.name) {
+            const errObj = {};
+            errObj.name = {
+              path: "name",
+              message: `Duplicate field value: "${responseData.keyValue.name}" Please use another value`,
+            };
+            this.providersErrors = errObj;
+          } else {
+            this.providersErrors = responseData.errors;
+          }
+        });
+    },
+
+    // Set provider on edit mode
+    setEditModeProvider(provider) {
+      this.provider = provider.name;
+      this.isProviderEditing = true;
+      this.editingProvider = provider;
+    },
+
+    // Handle edit provider
+    handleEditProvider(provider) {
+      console.log(this.provider);
+      const body = JSON.stringify({ name: this.provider });
+      axios
+        .patch(`api/v1/providers/${provider._id}`, body, {
+          headers: { "Content-Type": "application/josn" },
+        })
+        .then((res) => {
+          const data = res.data.data.provider;
+          this.providers = this.providers((el) => {
+            if (el._id === data._id) return data;
+            return el;
+          });
+
+          this.resetProvider();
         })
         .catch((err) => {
           const errResponse = err.response;

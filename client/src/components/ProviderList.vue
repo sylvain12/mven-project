@@ -17,6 +17,13 @@
         v-bind:class="{ 'p-invalid': providersErrors && providersErrors.name }"
       />
       <Button
+        v-if="isProviderEditing && provider !== ''"
+        icon="pi pi-save"
+        class="p-button-outlined p-button-primary"
+        @click="editProvider"
+      />
+      <Button
+        v-else
         icon="pi pi-plus"
         class="p-button-outlined p-button-primary"
         @click="addProvider"
@@ -47,6 +54,7 @@
               <Button
                 icon="pi pi-pencil"
                 class="p-button-outlined p-button-success"
+                @click="setProviderOnEdit(slotProps.data)"
               />
               <Button
                 icon="pi pi-trash"
@@ -82,6 +90,8 @@ export default {
     clientProviders: Array,
     isEditing: Boolean,
     providersErrors: Object,
+    isProviderEditing: Boolean,
+    editingProvider: Object,
   },
 
   data() {
@@ -89,7 +99,7 @@ export default {
       layout: "list",
       providersList: [],
       selectedProviders: [],
-      providerName: this.provider,
+      providerName: "",
       providerPerPage: 5,
     };
   },
@@ -115,6 +125,14 @@ export default {
 
     addProvider() {
       this.$emit("addProvider", this.providerName);
+    },
+
+    setProviderOnEdit(provider) {
+      this.$emit("setProviderOnEdit", provider);
+    },
+
+    editProvider() {
+      eventBus.$emit("editProvider", this.editingProvider);
     },
 
     loadSelectedProviders() {
