@@ -336,7 +336,6 @@ export default {
           this.provider = "";
           console.log(res.data);
           if (res.data.status === "success") {
-            console.log(this.provider);
             this.providers.push(item);
           }
         })

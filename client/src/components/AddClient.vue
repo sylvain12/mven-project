@@ -194,13 +194,9 @@ export default {
       this.$emit("addProvider", providerName);
     },
     // END =====================
-
-    checkForm() {
-      // this.save();
-    },
   },
 };
 </script>
 
-<style>
+<style scoped>
 </style>

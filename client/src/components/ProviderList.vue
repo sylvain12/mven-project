@@ -6,6 +6,7 @@
         type="text"
         v-model="providerName"
         placeholder="Add new provider"
+        @keypress.enter="addProvider"
       />
       <Button
         icon="pi pi-plus"
@@ -17,32 +18,34 @@
     <DataView
       :value="providersList"
       :layout="layout"
-      :rows="5"
+      :rows="providerPerPage"
       :paginator="true"
     >
       <template #list="slotProps">
-        <div class="provider-list">
-          <div class="p-field-checkbox">
-            <Checkbox
-              :id="slotProps.data._id"
-              v-model="selectedProviders"
-              name="providers"
-              :value="slotProps.data._id"
-              class="provider-checkbox"
-              @change="loadSelectedProviders"
-            />
-            <label :for="slotProps.data._id">{{ slotProps.data.name }}</label>
-          </div>
-          <div class="provider-list-action">
-            <Button
-              icon="pi pi-pencil"
-              class="p-button-outlined p-button-success"
-            />
-            <Button
-              icon="pi pi-trash"
-              class="p-button-outlined p-button-danger"
-              @click="deleteProvider(slotProps.data._id)"
-            />
+        <div>
+          <div class="provider-list">
+            <div class="p-field-checkbox">
+              <Checkbox
+                :id="slotProps.data._id"
+                v-model="selectedProviders"
+                name="providers"
+                :value="slotProps.data._id"
+                class="provider-checkbox"
+                @change="loadSelectedProviders"
+              />
+              <label :for="slotProps.data._id">{{ slotProps.data.name }}</label>
+            </div>
+            <div class="provider-list-action">
+              <Button
+                icon="pi pi-pencil"
+                class="p-button-outlined p-button-success"
+              />
+              <Button
+                icon="pi pi-trash"
+                class="p-button-outlined p-button-danger"
+                @click="deleteProvider(slotProps.data._id)"
+              />
+            </div>
           </div>
         </div>
       </template>
@@ -78,6 +81,7 @@ export default {
       providersList: [],
       selectedProviders: [],
       providerName: this.provider,
+      providerPerPage: 5,
     };
   },
 
@@ -113,9 +117,10 @@ export default {
 
 <style scoped>
 .provider-list {
-  display: flex !important;
+  display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 0.5rem;
 }
 
 .provider-checkbox {
