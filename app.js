@@ -9,8 +9,34 @@ const globalErrorHandler = require('./controllers/errorController');
 const clientRoute = require('./routes/clientRoutes');
 const providerRoute = require('./routes/providerRoutes');
 
+// Swagger 
+const swaggerUI = require('swagger-ui-express');
+const swaggerJsDoc = require('swagger-jsdoc');
+
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: 'Clients Manager API',
+      version: "1.0.0",
+      description: "A simple express library API for manage clients and providers for clients"
+    },
+    servers: [
+      {
+        url: "http://localhost:3002"
+      }
+    ]
+  },
+  apis: ['./routes/*.js']
+};
+
+const specs = swaggerJsDoc(options);
+
+
 // EXPRESS APP
 const app = express();
+
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 
 // GLOBAL MIDDLEWARE
 app.use(cors());
@@ -19,7 +45,6 @@ app.use(express.json());
 
 // Redirect the home to clients routes
 app.get('/', (req, res) => res.redirect('/api/v1/clients'));
-
 app.use('/api/v1/clients', clientRoute);
 app.use('/api/v1/providers', providerRoute);
 

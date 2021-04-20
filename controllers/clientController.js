@@ -2,6 +2,7 @@ const Client = require('../models/clientModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
+
 exports.getAllClients = catchAsync(async (req, res, next) => {
   const clients = await Client.find().populate('providers').select('-__v');
   res
