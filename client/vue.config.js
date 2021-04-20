@@ -1,4 +1,4 @@
-const NODE_PORT = process.env.PORT;
+const NODE_PORT = process.env.NODE_ENV;
 
 module.exports = {
   configureWebpack: {
