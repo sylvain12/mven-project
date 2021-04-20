@@ -131,6 +131,23 @@ NB: for deployment we use `production`
 
 ### `development`
     $ npm run dev
+
+  `LOCAL_SERVER` : `localhost:NODE_PORT`
+
+  `API_ROUTE` : `localhost:NODE_PORT/api-docs`
+
+  `CLIENT_APP` : `localhost:8000`
   
+
+## - PROJECT API 
+Visit this address on your web browser for project API documentation with [swagger](https://swagger.io/) and [openAPI](https://www.openapis.org/)
+
+
+# `localhost:<NODE_PORT>/api-docs`
+
 <!-- ### `production`
     $ npm run prod -->
+
+
+## 5. Testing
+Coming soon
