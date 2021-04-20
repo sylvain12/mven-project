@@ -9,6 +9,14 @@ const { getAllClients, createClient, updateClient, getClient, deleteClient } = r
 /**
  * @swagger
  * components:
+ *   parameters:
+ *     ClientParams:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The client id
  *   schemas:
  *      Client:
  *        type: object
@@ -96,15 +104,10 @@ router
  * @swagger
  * /api/v1/clients/{id}:
  *    get:
- *      summary: Get the book by id
+ *      summary: Get the client by id
  *      tags: [Clients]
  *      parameters:
- *        - in: path
- *          name: id
- *          schema:
- *             type: string
- *          required: true
- *          description: The client id
+ *        $ref: '#/components/parameters/ClientParams'
  * 
  *      responses:
  *          200:
@@ -124,12 +127,7 @@ router
  *      summary: Update the client by the id
  *      tags: [Clients]
  *      parameters:
- *        - in: path
- *          name: id
- *          schema:
- *            type: string
- *          required: true
- *          description: The book id
+ *        $ref: '#/components/parameters/ClientParams'
  *      requestBody:
  *        required: true
  *        content:
@@ -157,11 +155,7 @@ router
  *      summary: Delete the client by the id
  *      tags: [Clients]
  *      parameters:
- *        - in: path
- *          name: id
- *          schema:
- *            type: string
- *            description: The client id
+ *        $ref: '#/components/parameters/ClientParams'
  *      responses:
  *        202:
  *          description: The client was deleted
