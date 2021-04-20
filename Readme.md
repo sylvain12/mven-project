@@ -127,6 +127,17 @@ Replace all the variable between with their corresponding value
     NODE_ENV=development
 NB: for deployment we use `production`
 
+After variables environment configuration, set `NODE_PORT` on vue.js config to proxy node.js server API. Make sure to be on client folder, and open `vue.config.js` file.
+
+    $ nano vue.config.js
+
+    proxy: {
+      '/api/v1': {
+        target: `http://localhost:<NODE_PORT>`
+      }
+    }
+Don't forget to save the file.
+
 ## 4. Running the project
 
 ### `development`
