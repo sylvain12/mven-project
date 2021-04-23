@@ -188,6 +188,7 @@ export default {
       this.isEditing = false;
       this.selectedProviders = [];
       this.client = {};
+      this.errors = {};
     },
 
     // Show comfirm dialog for client delete
